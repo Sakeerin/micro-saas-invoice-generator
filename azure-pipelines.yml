@@ -1,0 +1,40 @@
+trigger:
+- main
+- develop
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: UsePhp@0
+  inputs:
+    phpVersion: '8.2'
+
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip unzip
+    composer install --no-interaction --prefer-dist --optimize-autoloader
+  displayName: 'Install Composer Dependencies'
+
+- script: |
+    cp .env.example .env
+    php artisan key:generate
+  displayName: 'Setup Environment'
+
+- script: |
+    npm install
+    npm run build
+  displayName: 'Install and Build NPM Assets'
+
+- script: ./vendor/bin/pint --test
+  displayName: 'Run Laravel Pint (Lint)'
+
+- script: ./vendor/bin/phpstan analyze
+  displayName: 'Run PHPStan (Static Analysis)'
+
+- script: |
+    mkdir -p database
+    touch database/database.sqlite
+    php artisan migrate --database=sqlite --force
+    ./vendor/bin/phpunit
+  displayName: 'Run PHPUnit Tests'
