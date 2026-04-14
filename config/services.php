@@ -41,4 +41,9 @@ return [
         ],
     ],
 
+    'dbd' => [
+        'api_key' => env('DBD_API_KEY'),
+        'api_url' => env('DBD_API_URL', 'https://openapi.dbd.go.th'),
+    ],
+
 ];

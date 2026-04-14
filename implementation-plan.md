@@ -935,21 +935,21 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 2 — Client & Product Database
 
 **วันที่ 6–7: Client CRUD**
-- [ ] Migration: `clients`
-- [ ] Client list, create, edit, delete
-- [ ] Search (Laravel Scout + database driver ก่อน, Meilisearch ทีหลัง)
+- [x] Migration: `clients`
+- [x] Client list, create, edit, delete
+- [x] Search (Laravel Scout + database driver ก่อน, Meilisearch ทีหลัง)
 - [ ] Import client จาก CSV (optional Phase 2)
 
 **วันที่ 8: DBD API Integration**
-- [ ] `DbtLookupService`: เรียก DBD API จากเลขนิติบุคคล 13 หลัก
-- [ ] Autofill: ชื่อบริษัท, ที่อยู่, ประเภทธุรกิจ
-- [ ] Graceful fallback ถ้า API ไม่ตอบ (timeout 3 วินาที)
+- [x] `DbtLookupService`: เรียก DBD API จากเลขนิติบุคคล 13 หลัก
+- [x] Autofill: ชื่อบริษัท, ที่อยู่, ประเภทธุรกิจ
+- [x] Graceful fallback ถ้า API ไม่ตอบ (timeout 3 วินาที)
 
 **วันที่ 9–10: Product CRUD**
-- [ ] Migration: `products`
-- [ ] Product list, create, edit, delete
-- [ ] Quick-add จาก invoice builder (ไม่ต้องออกหน้า)
-- [ ] Default WHT rate ต่อ product
+- [x] Migration: `products`
+- [x] Product list, create, edit, delete
+- [x] Quick-add จาก invoice builder (ไม่ต้องออกหน้า)
+- [x] Default WHT rate ต่อ product
 
 **Deliverable สัปดาห์ 2:** Client + Product database พร้อม, DBD lookup ทำงาน
 
