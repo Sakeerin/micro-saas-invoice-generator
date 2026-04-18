@@ -962,10 +962,10 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 3 — Invoice Builder UI
 
 **วันที่ 11–12: Invoice Form Core**
-- [ ] Migration: `invoices`, `invoice_items`
-- [ ] หน้า Create Invoice: client picker, issue date, due date, currency
-- [ ] Invoice number auto-generate: `{PREFIX}-{YEAR}-{NNNN}` เช่น `INV-2026-0001`
-- [ ] Reference field (PO number)
+- [x] Migration: `invoices`, `invoice_items`
+- [x] หน้า Create Invoice: client picker, issue date, due date, currency
+- [x] Invoice number auto-generate: `{PREFIX}-{YEAR}-{NNNN}` เช่น `INV-2026-0001`
+- [x] Reference field (PO number)
 
 **วันที่ 13–14: Line Items Editor**
 - [ ] `LineItemsEditor.vue`: add, edit, delete, reorder (Vue Draggable)

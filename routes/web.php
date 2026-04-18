@@ -36,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Products
         Route::resource('products', ProductController::class);
 
+        // Invoices
+        Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
+
         // API
         Route::get('/api/dbd/lookup/{tax_id}', [\App\Http\Controllers\Api\DbdController::class, 'lookup'])->name('api.dbd.lookup');
     });
