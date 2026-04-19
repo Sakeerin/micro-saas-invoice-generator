@@ -81,10 +81,26 @@ class InvoiceController extends Controller
                 'client_address_en' => $request->client_address_en,
                 'client_tax_id' => $request->client_tax_id,
                 // Add default values for required fields
-                'subtotal' => 0,
-                'total' => 0,
+                'subtotal' => collect($request->items)->sum('line_total'),
+                'total' => collect($request->items)->sum('line_total'), // Will be updated by TaxEngine later
                 'status' => 'draft',
             ]);
+
+            // Save items
+            foreach ($request->items as $index => $itemData) {
+                $invoice->items()->create([
+                    'product_id' => $itemData['product_id'] ?? null,
+                    'sort_order' => $index,
+                    'name' => $itemData['name'],
+                    'name_en' => $itemData['name_en'] ?? null,
+                    'description' => $itemData['description'] ?? null,
+                    'quantity' => $itemData['quantity'] ?? 1,
+                    'unit' => $itemData['unit'] ?? 'งาน',
+                    'unit_price' => $itemData['unit_price'] ?? 0,
+                    'discount_percent' => $itemData['discount_percent'] ?? 0,
+                    'line_total' => $itemData['line_total'] ?? 0,
+                ]);
+            }
 
             // Increment company next invoice number if this one was used
             $company->increment('invoice_next_number');

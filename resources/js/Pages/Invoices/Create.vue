@@ -6,6 +6,9 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { ref, watch } from 'vue';
+import LineItemsEditor from '@/Components/InvoiceBuilder/LineItemsEditor.vue';
+import ProductPickerModal from '@/Components/InvoiceBuilder/ProductPickerModal.vue';
+import { useModal } from 'vue-final-modal';
 
 const props = defineProps({
     clients: Array,
@@ -30,6 +33,34 @@ const form = useForm({
 });
 
 const selectedClientId = ref('');
+const currentItemIndex = ref(null);
+
+const { open: openProductPicker, close: closeProductPicker } = useModal({
+    component: ProductPickerModal,
+    attrs: {
+        products: props.products,
+        onSelect(product) {
+            if (currentItemIndex.value !== null) {
+                const item = form.items[currentItemIndex.value];
+                item.product_id = product.id;
+                item.name = product.name;
+                item.name_en = product.name_en;
+                item.description = product.description;
+                item.unit = product.unit;
+                item.unit_price = product.unit_price;
+            }
+            closeProductPicker();
+        },
+        onClose() {
+            closeProductPicker();
+        },
+    },
+});
+
+const handleOpenProductPicker = (index) => {
+    currentItemIndex.value = index;
+    openProductPicker();
+};
 
 watch(selectedClientId, (newId) => {
     const client = props.clients.find(c => c.id === newId);
@@ -147,12 +178,14 @@ const submit = () => {
                                 </div>
                             </div>
 
-                            <!-- Line Items Placeholder (Day 13-14) -->
                             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                                 <h3 class="text-lg font-medium text-gray-900 mb-4">Line Items</h3>
-                                <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
-                                    Line items editor will be implemented in the next phase.
-                                </div>
+                                <LineItemsEditor 
+                                    v-model="form.items" 
+                                    :products="products"
+                                    :currency="form.currency"
+                                    @open-product-picker="handleOpenProductPicker"
+                                />
                             </div>
                         </div>
 

@@ -968,10 +968,10 @@ table.items tbody td:nth-last-child(3) {
 - [x] Reference field (PO number)
 
 **วันที่ 13–14: Line Items Editor**
-- [ ] `LineItemsEditor.vue`: add, edit, delete, reorder (Vue Draggable)
-- [ ] Quick-select จาก product database (modal picker)
-- [ ] Inline edit: name, name_en, quantity, unit, unit_price, discount_percent
-- [ ] Real-time line total calculation (computed)
+- [x] `LineItemsEditor.vue`: add, edit, delete, reorder (Vue Draggable)
+- [x] Quick-select จาก product database (modal picker)
+- [x] Inline edit: name, name_en, quantity, unit, unit_price, discount_percent
+- [x] Real-time line total calculation (computed)
 
 **วันที่ 15: Discount + Notes**
 - [ ] Invoice-level discount: none | percent | amount (toggle)
@@ -1281,7 +1281,7 @@ Break-even: ~12 Pro users → MRR ฿2,388 > infra ฿2,150
 ### MVP Launch Checklist
 
 **Core Features**
-- [ ] สร้าง invoice พร้อม line items ได้
+- [x] สร้าง invoice พร้อม line items ได้
 - [ ] คำนวณ VAT + WHT ถูกต้องทุก scenario (ผ่าน unit test)
 - [ ] Download PDF: Thai font สมบูรณ์, layout ไม่แตก
 - [ ] 5 templates ให้เลือก
