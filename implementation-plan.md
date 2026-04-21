@@ -974,10 +974,10 @@ table.items tbody td:nth-last-child(3) {
 - [x] Real-time line total calculation (computed)
 
 **วันที่ 15: Discount + Notes**
-- [ ] Invoice-level discount: none | percent | amount (toggle)
-- [ ] Notes / payment terms textarea
-- [ ] Language selector: ไทย | English | ทั้งสองภาษา
-- [ ] Template selector (preview thumbnail)
+- [x] Invoice-level discount: none | percent | amount (toggle)
+- [x] Notes / payment terms textarea
+- [x] Language selector: ไทย | English | ทั้งสองภาษา
+- [x] Template selector (preview thumbnail)
 
 **Deliverable สัปดาห์ 3:** สร้าง invoice ด้วย line items ได้ (ยังไม่ได้คำนวณ tax)
 
@@ -986,8 +986,8 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 4 — Tax Engine + Summary
 
 **วันที่ 16–17: TaxEngineService**
-- [ ] `TaxEngineService::calculate()` ตาม design ข้างบน
-- [ ] Unit test ครบทุก scenario:
+- [x] `TaxEngineService::calculate()` ตาม design ข้างบน
+- [x] Unit test ครบทุก scenario:
   - VAT only (WHT 0%)
   - WHT only (VAT 0%)
   - VAT + WHT (ทั้งคู่)
@@ -997,16 +997,16 @@ table.items tbody td:nth-last-child(3) {
   - ตัวเลขทศนิยม (precision test)
 
 **วันที่ 18–19: Tax Summary UI**
-- [ ] `TaxSummary.vue`: แสดง subtotal, discount, VAT, WHT, total แบบ real-time
-- [ ] WHT rate selector (0%, 1%, 3%, 5%)
-- [ ] VAT toggle (มี/ไม่มี)
-- [ ] บันทึก invoice (draft) ด้วย tax amounts ที่คำนวณแล้ว
+- [x] `TaxSummary.vue`: แสดง subtotal, discount, VAT, WHT, total แบบ real-time
+- [x] WHT rate selector (0%, 1%, 3%, 5%)
+- [x] VAT toggle (มี/ไม่มี)
+- [x] บันทึก invoice (draft) ด้วย tax amounts ที่คำนวณแล้ว
 
 **วันที่ 20: Invoice Management**
-- [ ] Invoice list: status badge, amount, client, date
-- [ ] Filter: status, date range, client
-- [ ] Pagination
-- [ ] Duplicate invoice (copy ทุกอย่างยกเว้นวันที่และ number)
+- [x] Invoice list: status badge, amount, client, date
+- [x] Filter: status, date range, client
+- [x] Pagination
+- [x] Duplicate invoice (copy ทุกอย่างยกเว้นวันที่และ number)
 
 **Deliverable สัปดาห์ 4:** สร้าง invoice ครบ คำนวณ VAT+WHT ถูกต้อง
 

@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('products', ProductController::class);
 
         // Invoices
+        Route::post('invoices/{invoice}/duplicate', [\App\Http\Controllers\InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
 
         // API
