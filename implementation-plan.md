@@ -1019,11 +1019,11 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 5 — Browsershot Setup + Template 1
 
 **วันที่ 21–22: Browsershot + Queue**
-- [ ] `GenerateInvoicePdfJob` ส่งเข้า queue `pdf` แยก
-- [ ] `InvoicePdfService::generate()` ตาม design ข้างบน
-- [ ] Download Thai fonts: Sarabun-Regular, Sarabun-Bold, NotoSansThai-Regular
-- [ ] inject base64 font CSS ใน HTML template
-- [ ] Test: generate PDF ของ invoice จริง ดู Thai font แสดงถูกต้อง
+- [x] `GenerateInvoicePdfJob` ส่งเข้า queue `pdf` แยก
+- [x] `InvoicePdfService::generate()` ตาม design ข้างบน
+- [x] Download Thai fonts: Sarabun-Regular, Sarabun-Bold, NotoSansThai-Regular
+- [x] inject base64 font CSS ใน HTML template
+- [x] Test: generate PDF ของ invoice จริง ดู Thai font แสดงถูกต้อง
 
 **วันที่ 23–24: Modern Template**
 - [ ] `modern.blade.php` ตาม HTML template ข้างบน
