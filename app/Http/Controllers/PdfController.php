@@ -15,7 +15,7 @@ class PdfController extends Controller
         // Verify ownership
         $user = auth()->user();
         $company = $user->companies()->first();
-        if ($invoice->company_id !== $company->id) {
+        if (!$company || $invoice->company_id !== $company->id) {
             abort(403);
         }
 
@@ -24,15 +24,13 @@ class PdfController extends Controller
             return redirect($invoice->pdf_url);
         }
 
-        // If not, generate it (synchronously for the first time or use queue and wait)
-        // For download button, we might want to generate it synchronously or show a loading state
-        // The implementation plan says "dispatch job if no cache" but also mentions redirect to presigned URL
-        
-        // Let's generate it synchronously here for simplicity of the download button
-        // In a production app, we might use a queue and broadcast the result
-        $pdfUrl = $pdfService->generate($invoice);
+        // Dispatch job to generate PDF
+        GenerateInvoicePdfJob::dispatch($invoice);
 
-        return redirect($pdfUrl);
+        // Return a response indicating that generation has started
+        // For Inertia, we might want to return a back() with a flash message
+        // or a specific status if it's an API call.
+        return back()->with('status', 'Generating PDF... Please wait a moment.');
     }
 
     public function preview(Invoice $invoice, InvoicePdfService $pdfService)
@@ -40,36 +38,14 @@ class PdfController extends Controller
         // Verify ownership
         $user = auth()->user();
         $company = $user->companies()->first();
-        if ($invoice->company_id !== $company->id) {
+        if (!$company || $invoice->company_id !== $company->id) {
             abort(403);
         }
 
         // Just render the HTML for preview
         return view("pdf.templates.{$invoice->template}", [
             'invoice' => $invoice->load(['items', 'client', 'company']),
-            'fontCss' => $this->getFontCss(),
+            'fontCss' => $pdfService->buildFontCss(),
         ]);
-    }
-
-    private function getFontCss(): string
-    {
-        $css = '';
-        $fonts = [
-            'Sarabun'       => 'Sarabun-Regular.ttf',
-            'Sarabun-Bold'  => 'Sarabun-Bold.ttf',
-            'NotoSansThai'  => 'NotoSansThai-Regular.ttf',
-        ];
-
-        foreach ($fonts as $family => $filename) {
-            $path = storage_path("fonts/{$filename}");
-            if (file_exists($path)) {
-                $base64 = base64_encode(file_get_contents($path));
-                $css .= "@font-face {
-                    font-family: '{$family}';
-                    src: url('data:font/truetype;base64,{$base64}') format('truetype');
-                }\n";
-            }
-        }
-        return $css;
     }
 }

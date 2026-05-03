@@ -79,7 +79,7 @@ class InvoicePdfService
         ])->render();
     }
 
-    private function buildFontCss(): string
+    public function buildFontCss(): string
     {
         $css = '';
         foreach (self::THAI_FONTS as $family => $filename) {

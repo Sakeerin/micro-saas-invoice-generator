@@ -46,7 +46,11 @@ class GenerateInvoicePdfJob implements ShouldQueue
         try {
             Log::info("Generating PDF for Invoice: {$this->invoice->invoice_number}");
             $pdfService->generate($this->invoice);
-            Log::info("PDF Generated for Invoice: {$this->invoice->invoice_number}");
+            
+            // Broadcast that the PDF is ready
+            \App\Events\InvoicePdfReady::dispatch($this->invoice);
+            
+            Log::info("PDF Generated and broadcasted for Invoice: {$this->invoice->invoice_number}");
         } catch (\Exception $e) {
             Log::error("Failed to generate PDF for Invoice: {$this->invoice->invoice_number}. Error: {$e->getMessage()}");
             throw $e;
