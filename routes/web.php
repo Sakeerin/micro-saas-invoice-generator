@@ -40,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('invoices/{invoice}/duplicate', [\App\Http\Controllers\InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
 
+        // PDF
+        Route::get('invoices/{invoice}/download', [\App\Http\Controllers\PdfController::class, 'download'])->name('invoices.download');
+        Route::get('invoices/{invoice}/preview', [\App\Http\Controllers\PdfController::class, 'preview'])->name('invoices.preview');
+
         // API
         Route::get('/api/dbd/lookup/{tax_id}', [\App\Http\Controllers\Api\DbdController::class, 'lookup'])->name('api.dbd.lookup');
     });
