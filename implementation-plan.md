@@ -1026,15 +1026,15 @@ table.items tbody td:nth-last-child(3) {
 - [x] Test: generate PDF ของ invoice จริง ดู Thai font แสดงถูกต้อง
 
 **วันที่ 23–24: Modern Template**
-- [ ] `modern.blade.php` ตาม HTML template ข้างบน
-- [ ] ทดสอบ: A4 size, margins, page break ระหว่าง line items ยาว
-- [ ] ทดสอบ: logo, brand color, bilingual content
+- [x] `modern.blade.php` ตาม HTML template ข้างบน
+- [x] ทดสอบ: A4 size, margins, page break ระหว่าง line items ยาว
+- [x] ทดสอบ: logo, brand color, bilingual content
 
 **วันที่ 25: R2 Cache + Download**
-- [ ] `InvoicePdfService::isCacheValid()` ตรวจ hash
-- [ ] `PdfController@download`: ตรวจ cache → dispatch job ถ้าไม่มี
-- [ ] Pusher broadcast `InvoicePdfReady` → Vue แสดง download link อัตโนมัติ
-- [ ] Presigned URL หมดอายุ 24 ชั่วโมง
+- [x] `InvoicePdfService::isCacheValid()` ตรวจ hash
+- [x] `PdfController@download`: ตรวจ cache → dispatch job ถ้าไม่มี
+- [x] Pusher broadcast `InvoicePdfReady` → Vue แสดง download link อัตโนมัติ
+- [x] Presigned URL หมดอายุ 24 ชั่วโมง
 
 **Deliverable สัปดาห์ 5:** Download PDF ได้ Thai font สมบูรณ์
 
@@ -1043,8 +1043,8 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 6 — อีก 4 Templates + Preview
 
 **วันที่ 26–27: Classic + Minimal Templates**
-- [ ] `classic.blade.php`: เส้นตาราง, header สีเข้ม, ดูเป็นทางการ
-- [ ] `minimal.blade.php`: ไม่มี border, whitespace เยอะ, สไตล์ modern
+- [x] `classic.blade.php`: เส้นตาราง, header สีเข้ม, ดูเป็นทางการ
+- [x] `minimal.blade.php`: ไม่มี border, whitespace เยอะ, สไตล์ modern
 
 **วันที่ 28–29: Corporate + Creative Templates**
 - [ ] `corporate.blade.php`: สีขาวดำ, header แถบกว้าง, เหมาะองค์กร
