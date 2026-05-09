@@ -1047,13 +1047,13 @@ table.items tbody td:nth-last-child(3) {
 - [x] `minimal.blade.php`: ไม่มี border, whitespace เยอะ, สไตล์ modern
 
 **วันที่ 28–29: Corporate + Creative Templates**
-- [ ] `corporate.blade.php`: สีขาวดำ, header แถบกว้าง, เหมาะองค์กร
-- [ ] `creative.blade.php`: accent color เข้ม, layout สองคอลัมน์
+- [x] `corporate.blade.php`: สีขาวดำ, header แถบกว้าง, เหมาะองค์กร
+- [x] `creative.blade.php`: accent color เข้ม, layout สองคอลัมน์
 
 **วันที่ 30: Live Preview**
-- [ ] Invoice builder แสดง preview ด้านขวา (iframe render HTML เดียวกับ PDF)
-- [ ] Preview update เมื่อ line items เปลี่ยน (debounce 500ms)
-- [ ] Template switcher: คลิกเปลี่ยน template เห็นผลทันที
+- [x] Invoice builder แสดง preview ด้านขวา (iframe render HTML เดียวกับ PDF)
+- [x] Preview update เมื่อ line items เปลี่ยน (debounce 500ms)
+- [x] Template switcher: คลิกเปลี่ยน template เห็นผลทันที
 
 **Deliverable สัปดาห์ 6:** 5 templates พร้อม live preview ใน builder
 
@@ -1066,10 +1066,10 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 7 — Share Link + Email + Tracking
 
 **วันที่ 31–32: Share Link**
-- [ ] Generate `share_token` (random 64-char) เมื่อ invoice ถูกส่ง
-- [ ] Public route: `GET /invoice/share/{token}` (ไม่ต้อง login)
-- [ ] Public view: read-only invoice หน้าเดิม + download PDF button
-- [ ] Copy link button ใน invoice detail
+- [x] Generate `share_token` (random 64-char) เมื่อ invoice ถูกส่ง
+- [x] Public route: `GET /invoice/share/{token}` (ไม่ต้อง login)
+- [x] Public view: read-only invoice หน้าเดิม + download PDF button
+- [x] Copy link button ใน invoice detail (Index page)
 
 **วันที่ 33–34: Email Delivery**
 - [ ] Email template: subject "ใบแจ้งหนี้ {number} จาก {company}"

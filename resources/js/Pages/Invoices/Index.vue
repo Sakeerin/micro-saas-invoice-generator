@@ -1,14 +1,42 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import debounce from 'lodash/debounce';
+import Modal from '@/Components/Modal.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import { usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     invoices: Object,
     filters: Object,
     clients: Array,
 });
+
+const page = usePage();
+const flashShareLink = computed(() => page.props.flash.share_link);
+const showShareModal = ref(false);
+const currentShareLink = ref('');
+
+const copyToClipboard = () => {
+    navigator.clipboard.writeText(currentShareLink.value);
+    alert('Link copied to clipboard!');
+};
+
+const shareInvoice = (id) => {
+    router.post(route('invoices.share', id), {}, {
+        onSuccess: (page) => {
+            currentShareLink.value = page.props.flash.share_link;
+            showShareModal.value = true;
+        }
+    });
+};
+
+const sendInvoice = (id) => {
+    if (confirm('Send this invoice to the client via email?')) {
+        router.post(route('invoices.send', id));
+    }
+};
 
 const filterForm = useForm({
     search: props.filters.search || '',
@@ -180,6 +208,20 @@ const resetFilters = () => {
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium space-x-3">
                                             <button 
+                                                @click="sendInvoice(invoice.id)" 
+                                                class="text-green-600 hover:text-green-900 font-bold"
+                                                title="Send to Client"
+                                            >
+                                                Send
+                                            </button>
+                                            <button 
+                                                @click="shareInvoice(invoice.id)" 
+                                                class="text-indigo-600 hover:text-indigo-900 font-bold"
+                                                title="Get Share Link"
+                                            >
+                                                Share
+                                            </button>
+                                            <button 
                                                 @click="duplicateInvoice(invoice.id)" 
                                                 class="text-gray-600 hover:text-indigo-600 transition-colors"
                                                 title="Duplicate"
@@ -213,4 +255,37 @@ const resetFilters = () => {
             </div>
         </div>
     </AuthenticatedLayout>
+
+    <Modal :show="showShareModal" @close="showShareModal = false">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900">
+                Invoice Share Link
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-600">
+                Copy the link below to send to your client. Anyone with this link can view the invoice.
+            </p>
+
+            <div class="mt-4 flex">
+                <input
+                    type="text"
+                    readonly
+                    :value="currentShareLink"
+                    class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-l-md shadow-sm text-sm bg-gray-50"
+                />
+                <button
+                    @click="copyToClipboard"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-r-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150"
+                >
+                    Copy
+                </button>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <SecondaryButton @click="showShareModal = false">
+                    Close
+                </SecondaryButton>
+            </div>
+        </div>
+    </Modal>
 </template>

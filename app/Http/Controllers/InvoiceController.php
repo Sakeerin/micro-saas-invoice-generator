@@ -12,6 +12,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvoiceMail;
 
 class InvoiceController extends Controller
 {
@@ -84,9 +86,6 @@ class InvoiceController extends Controller
      */
     public function store(Request $request, TaxEngineService $taxEngine)
     {
-        // Validation will be added in a later step
-        // For now, focus on UI and saving basic info
-        
         $user = auth()->user();
         $company = $user->companies()->first();
 
@@ -134,7 +133,6 @@ class InvoiceController extends Controller
 
             // Save items
             foreach ($request->items as $index => $itemData) {
-                // Calculate line total for safety (though frontend should have it)
                 $lineSubtotal = $itemData['quantity'] * $itemData['unit_price'];
                 $lineTotal = $lineSubtotal * (1 - ($itemData['discount_percent'] ?? 0) / 100);
 
@@ -152,7 +150,6 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            // Increment company next invoice number if this one was used
             $company->increment('invoice_next_number');
         });
 
@@ -200,13 +197,11 @@ class InvoiceController extends Controller
             $newInvoice->status = 'draft';
             $newInvoice->issue_date = now();
             
-            // Re-calculate due date based on duration
             if ($invoice->due_date && $invoice->issue_date) {
                 $days = $invoice->issue_date->diffInDays($invoice->due_date);
                 $newInvoice->due_date = now()->addDays($days);
             }
             
-            // Clear tracking/PDF info
             $newInvoice->pdf_url = null;
             $newInvoice->pdf_hash = null;
             $newInvoice->share_token = null;
@@ -219,7 +214,6 @@ class InvoiceController extends Controller
             
             $newInvoice->save();
 
-            // Duplicate items
             foreach ($invoice->items as $item) {
                 $newItem = $item->replicate();
                 $newItem->invoice_id = $newInvoice->id;
@@ -230,5 +224,92 @@ class InvoiceController extends Controller
         });
 
         return redirect()->route('invoices.index');
+    }
+
+    /**
+     * Display the specified resource for public view via token.
+     */
+    public function showPublic(string $token, \App\Services\InvoicePdfService $pdfService)
+    {
+        $invoice = Invoice::where('share_token', $token)
+            ->with(['company', 'items'])
+            ->firstOrFail();
+
+        $now = now();
+        $updateData = [
+            'view_count' => $invoice->view_count + 1,
+            'last_viewed_at' => $now,
+        ];
+
+        if (!$invoice->first_viewed_at) {
+            $updateData['first_viewed_at'] = $now;
+        }
+
+        if ($invoice->status === 'sent') {
+            $updateData['status'] = 'viewed';
+        }
+
+        $invoice->update($updateData);
+
+        return view("pdf.public_view", [
+            'invoice' => $invoice,
+        ]);
+    }
+
+    /**
+     * Generate share link for an invoice.
+     */
+    public function share(Invoice $invoice)
+    {
+        $user = auth()->user();
+        $company = $user->companies()->first();
+
+        if ($invoice->company_id !== $company->id) {
+            abort(403);
+        }
+
+        if (!$invoice->share_token) {
+            $invoice->update([
+                'share_token' => Str::random(64),
+                'status' => $invoice->status === 'draft' ? 'sent' : $invoice->status,
+                'email_sent_at' => now(),
+            ]);
+        }
+
+        return back()->with('share_link', route('invoices.show_public', $invoice->share_token));
+    }
+
+    /**
+     * Send invoice to client via email.
+     */
+    public function sendByEmail(Invoice $invoice, Request $request)
+    {
+        $user = auth()->user();
+        $company = $user->companies()->first();
+
+        if ($invoice->company_id !== $company->id) {
+            abort(403);
+        }
+
+        $email = $request->email ?? $invoice->client?->contact_email;
+
+        if (!$email) {
+            return back()->with('error', 'Client email not found.');
+        }
+
+        if (!$invoice->share_token) {
+            $invoice->update([
+                'share_token' => Str::random(64),
+            ]);
+        }
+
+        Mail::to($email)->send(new InvoiceMail($invoice->load(['company', 'items', 'client'])));
+
+        $invoice->update([
+            'status' => in_array($invoice->status, ['draft', 'sent']) ? 'sent' : $invoice->status,
+            'email_sent_at' => now(),
+        ]);
+
+        return back()->with('success', 'Invoice has been sent successfully.');
     }
 }

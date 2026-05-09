@@ -160,7 +160,7 @@ table.items tbody td:nth-last-child(3) {
 }
 
 .bank-info strong {
-  color: #333;
+color: #333;
 }
 </style>
 </head>

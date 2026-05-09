@@ -17,6 +17,11 @@ Route::get('/', function () {
     ]);
 });
 
+// Public Invoice Sharing
+Route::get('invoice/share/{token}', [\App\Http\Controllers\InvoiceController::class, 'showPublic'])->name('invoices.show_public');
+Route::get('invoice/share/{token}/preview', [\App\Http\Controllers\PdfController::class, 'previewPublic'])->name('invoices.preview_public');
+Route::get('tracking/pixel/{token}.gif', [\App\Http\Controllers\TrackingController::class, 'pixel'])->name('tracking.pixel');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/company/wizard', [CompanyController::class, 'wizard'])->name('company.wizard');
     Route::post('/company/wizard', [CompanyController::class, 'store'])->name('company.store');
@@ -38,11 +43,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Invoices
         Route::post('invoices/{invoice}/duplicate', [\App\Http\Controllers\InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
+        Route::post('invoices/{invoice}/share', [\App\Http\Controllers\InvoiceController::class, 'share'])->name('invoices.share');
+        Route::post('invoices/{invoice}/send', [\App\Http\Controllers\InvoiceController::class, 'sendByEmail'])->name('invoices.send');
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
 
         // PDF
         Route::get('invoices/{invoice}/download', [\App\Http\Controllers\PdfController::class, 'download'])->name('invoices.download');
         Route::get('invoices/{invoice}/preview', [\App\Http\Controllers\PdfController::class, 'preview'])->name('invoices.preview');
+        Route::post('invoices/preview', [\App\Http\Controllers\PdfController::class, 'previewDraft'])->name('invoices.preview_draft');
 
         // API
         Route::get('/api/dbd/lookup/{tax_id}', [\App\Http\Controllers\Api\DbdController::class, 'lookup'])->name('api.dbd.lookup');
