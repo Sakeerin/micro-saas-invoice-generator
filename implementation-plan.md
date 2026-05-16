@@ -1072,10 +1072,10 @@ table.items tbody td:nth-last-child(3) {
 - [x] Copy link button ใน invoice detail (Index page)
 
 **วันที่ 33–34: Email Delivery**
-- [ ] Email template: subject "ใบแจ้งหนี้ {number} จาก {company}"
-- [ ] Email body: invoice summary + link + download button
-- [ ] Tracking pixel: `<img src="/tracking/pixel/{token}.gif" width="1" height="1">`
-- [ ] `GET /tracking/pixel/{token}.gif` → log open event → return 1x1 GIF
+- [x] Email template: subject "ใบแจ้งหนี้ {number} จาก {company}"
+- [x] Email body: invoice summary + link + download button
+- [x] Tracking pixel: `<img src="/tracking/pixel/{token}.gif" width="1" height="1">`
+- [x] `GET /tracking/pixel/{token}.gif` → log open event → return 1x1 GIF
 
 **วันที่ 35: Status Flow**
 - [ ] Status badge: draft → sent → viewed → paid → overdue
