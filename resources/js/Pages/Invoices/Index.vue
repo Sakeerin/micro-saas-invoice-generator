@@ -56,6 +56,12 @@ const duplicateInvoice = (id) => {
     }
 };
 
+const markAsPaid = (id) => {
+    if (confirm('Mark this invoice as paid?')) {
+        router.post(route('invoices.mark_as_paid', id));
+    }
+};
+
 const getStatusBadgeClass = (status) => {
     switch (status) {
         case 'draft': return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -207,6 +213,14 @@ const resetFilters = () => {
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium space-x-3">
+                                            <button 
+                                                v-if="invoice.status !== 'paid' && invoice.status !== 'cancelled'"
+                                                @click="markAsPaid(invoice.id)" 
+                                                class="text-green-600 hover:text-green-900 font-bold"
+                                                title="Mark as Paid"
+                                            >
+                                                Paid
+                                            </button>
                                             <button 
                                                 @click="sendInvoice(invoice.id)" 
                                                 class="text-green-600 hover:text-green-900 font-bold"

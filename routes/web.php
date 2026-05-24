@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('invoices/{invoice}/duplicate', [\App\Http\Controllers\InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
         Route::post('invoices/{invoice}/share', [\App\Http\Controllers\InvoiceController::class, 'share'])->name('invoices.share');
         Route::post('invoices/{invoice}/send', [\App\Http\Controllers\InvoiceController::class, 'sendByEmail'])->name('invoices.send');
+        Route::post('invoices/{invoice}/mark-as-paid', [\App\Http\Controllers\InvoiceController::class, 'markAsPaid'])->name('invoices.mark_as_paid');
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
 
         // PDF

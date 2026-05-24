@@ -131,6 +131,11 @@ class InvoiceController extends Controller
                 'status' => 'draft',
             ]);
 
+            $invoice->activities()->create([
+                'type' => 'created',
+                'meta' => ['user_id' => auth()->id()],
+            ]);
+
             // Save items
             foreach ($request->items as $index => $itemData) {
                 $lineSubtotal = $itemData['quantity'] * $itemData['unit_price'];
@@ -214,6 +219,11 @@ class InvoiceController extends Controller
             
             $newInvoice->save();
 
+            $newInvoice->activities()->create([
+                'type' => 'created',
+                'meta' => ['source_invoice_id' => $invoice->id, 'user_id' => auth()->id()],
+            ]);
+
             foreach ($invoice->items as $item) {
                 $newItem = $item->replicate();
                 $newItem->invoice_id = $newInvoice->id;
@@ -251,6 +261,15 @@ class InvoiceController extends Controller
 
         $invoice->update($updateData);
 
+        $invoice->activities()->create([
+            'type' => 'viewed',
+            'meta' => [
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'is_first_view' => !$invoice->first_viewed_at,
+            ],
+        ]);
+
         return view("pdf.public_view", [
             'invoice' => $invoice,
         ]);
@@ -268,11 +287,18 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        if (!$invoice->share_token) {
+        $isFirstSent = !$invoice->share_token;
+
+        if ($isFirstSent) {
             $invoice->update([
                 'share_token' => Str::random(64),
                 'status' => $invoice->status === 'draft' ? 'sent' : $invoice->status,
                 'email_sent_at' => now(),
+            ]);
+
+            $invoice->activities()->create([
+                'type' => 'sent',
+                'meta' => ['method' => 'link', 'user_id' => auth()->id()],
             ]);
         }
 
@@ -310,6 +336,36 @@ class InvoiceController extends Controller
             'email_sent_at' => now(),
         ]);
 
+        $invoice->activities()->create([
+            'type' => 'sent',
+            'meta' => ['method' => 'email', 'recipient' => $email, 'user_id' => auth()->id()],
+        ]);
+
         return back()->with('success', 'Invoice has been sent successfully.');
+    }
+
+    /**
+     * Mark the specified invoice as paid.
+     */
+    public function markAsPaid(Invoice $invoice)
+    {
+        $user = auth()->user();
+        $company = $user->companies()->first();
+
+        if ($invoice->company_id !== $company->id) {
+            abort(403);
+        }
+
+        $invoice->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+        ]);
+
+        $invoice->activities()->create([
+            'type' => 'paid',
+            'meta' => ['user_id' => auth()->id()],
+        ]);
+
+        return back()->with('success', 'Invoice marked as paid.');
     }
 }

@@ -49,4 +49,9 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceItem::class)->orderBy('sort_order');
     }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(InvoiceActivity::class)->orderByDesc('created_at');
+    }
 }

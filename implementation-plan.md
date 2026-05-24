@@ -1078,11 +1078,11 @@ table.items tbody td:nth-last-child(3) {
 - [x] `GET /tracking/pixel/{token}.gif` → log open event → return 1x1 GIF
 
 **วันที่ 35: Status Flow**
-- [ ] Status badge: draft → sent → viewed → paid → overdue
-- [ ] Auto-update `viewed` เมื่อ share link เปิด (ครั้งแรก)
-- [ ] Auto-update `overdue` ด้วย scheduler (เช้าทุกวัน ตรวจ due_date)
-- [ ] Mark as paid manually (button)
-- [ ] `invoice_activities` log ทุก event
+- [x] Status badge: draft → sent → viewed → paid → overdue
+- [x] Auto-update `viewed` เมื่อ share link เปิด (ครั้งแรก)
+- [x] Auto-update `overdue` ด้วย scheduler (เช้าทุกวัน ตรวจ due_date)
+- [x] Mark as paid manually (button)
+- [x] `invoice_activities` log ทุก event
 
 **Deliverable สัปดาห์ 7:** ส่ง invoice ผ่าน email + รู้ว่า viewed แล้ว
 
@@ -1287,7 +1287,7 @@ Break-even: ~12 Pro users → MRR ฿2,388 > infra ฿2,150
 - [ ] 5 templates ให้เลือก
 - [ ] Share link สำหรับลูกค้า
 - [ ] Email invoice พร้อม tracking "viewed"
-- [ ] Invoice status flow: draft → sent → viewed → paid
+- [x] Invoice status flow: draft → sent → viewed → paid
 - [ ] Client และ Product database พร้อม autofill
 - [ ] DBD lookup จากเลขนิติบุคคล
 

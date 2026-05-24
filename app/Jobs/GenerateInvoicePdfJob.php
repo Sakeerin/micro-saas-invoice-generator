@@ -47,6 +47,11 @@ class GenerateInvoicePdfJob implements ShouldQueue
             Log::info("Generating PDF for Invoice: {$this->invoice->invoice_number}");
             $pdfService->generate($this->invoice);
             
+            $this->invoice->activities()->create([
+                'type' => 'pdf_generated',
+                'meta' => ['hash' => $this->invoice->pdf_hash],
+            ]);
+
             // Broadcast that the PDF is ready
             \App\Events\InvoicePdfReady::dispatch($this->invoice);
             
