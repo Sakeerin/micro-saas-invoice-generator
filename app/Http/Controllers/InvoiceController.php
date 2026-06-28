@@ -18,6 +18,20 @@ use App\Mail\InvoiceMail;
 class InvoiceController extends Controller
 {
     /**
+     * Return the next available invoice number for the authenticated company.
+     * Used by Create.vue to refresh the number if it may have been taken concurrently.
+     */
+    public function nextNumber(): \Illuminate\Http\JsonResponse
+    {
+        $company = auth()->user()->companies()->first();
+        $year = now()->year;
+        $prefix = $company->invoice_prefix ?? 'INV';
+        $nextNumber = str_pad($company->invoice_next_number ?? 1, 4, '0', STR_PAD_LEFT);
+
+        return response()->json(['invoice_number' => "{$prefix}-{$year}-{$nextNumber}"]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): Response

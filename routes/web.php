@@ -27,9 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/company/wizard', [CompanyController::class, 'store'])->name('company.store');
 
     Route::middleware([\App\Http\Middleware\EnsureCompanyIsSet::class])->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('Dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -55,6 +53,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // API
         Route::get('/api/dbd/lookup/{tax_id}', [\App\Http\Controllers\Api\DbdController::class, 'lookup'])->name('api.dbd.lookup');
+        Route::post('/api/ai/suggest-items', [\App\Http\Controllers\Api\AiSuggestController::class, 'suggest'])->name('api.ai.suggest');
+        Route::get('/api/clients/{clientId}/top-items', [\App\Http\Controllers\Api\AiSuggestController::class, 'clientTopItems'])->name('api.clients.top-items');
+        Route::get('/api/invoices/next-number', [\App\Http\Controllers\InvoiceController::class, 'nextNumber'])->name('api.invoices.next-number');
     });
 });
 

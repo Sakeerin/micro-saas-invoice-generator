@@ -1091,21 +1091,22 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 8 — AI Autofill
 
 **วันที่ 36–37: Line Item Suggestions**
-- [ ] `AiAutofillService`: ส่ง client history + current items ไปหา Claude
-- [ ] Claude return: suggested line items + price range จากประวัติ
-- [ ] Vercel AI SDK `streamText()` → streaming suggestions ใน `AiSuggestPanel.vue`
-- [ ] User คลิก "เพิ่ม" → add line item ทันที
+- [x] `AiAutofillService`: ส่ง client history + current items ไปหา Claude
+- [x] Claude return: suggested line items + price range จากประวัติ
+- [x] `AiSuggestPanel.vue`: แสดง loading state และ suggestions list
+- [x] User คลิก "เพิ่ม" → add line item ทันที
 
 **วันที่ 38–39: Smart Autofill**
-- [ ] เมื่อเลือก client → auto-suggest line items ที่เคยใช้กับ client นี้ (top 5)
-- [ ] Price memory: แนะนำราคาเฉลี่ยของ service นั้นๆ
-- [ ] Invoice number format จาก company settings
+- [x] เมื่อเลือก client → auto-suggest line items ที่เคยใช้กับ client นี้ (top 5) ผ่าน `ClientTopItemsPanel.vue`
+- [x] Price memory: `AiAutofillService::buildPriceMemory()` รวม avg/min/max price ต่อ service ส่งให้ Claude
+- [x] Invoice number format จาก company settings + refresh button เพื่อดึงเลขล่าสุด
 
 **วันที่ 40: Dashboard + Analytics**
-- [ ] Dashboard: total revenue (paid), outstanding (sent+viewed+overdue), draft count
-- [ ] Chart: revenue by month (last 6 months) ใช้ Chart.js
-- [ ] Top clients by revenue
-- [ ] Average days to payment
+- [x] Dashboard: total revenue (paid), outstanding (sent+viewed+overdue), draft count, overdue count
+- [x] Chart: revenue by month (last 6 months) ใช้ Chart.js (bar chart)
+- [x] Top clients by revenue (top 5)
+- [x] Average days to payment (issue_date → paid_at)
+- [x] Recent invoices table + quick actions
 
 **Deliverable สัปดาห์ 8:** AI autofill ทำงาน, dashboard แสดงข้อมูลครบ
 

@@ -11,6 +11,8 @@ import axios from 'axios';
 import LineItemsEditor from '@/Components/InvoiceBuilder/LineItemsEditor.vue';
 import ProductPickerModal from '@/Components/InvoiceBuilder/ProductPickerModal.vue';
 import TaxSummary from '@/Components/InvoiceBuilder/TaxSummary.vue';
+import AiSuggestPanel from '@/Components/InvoiceBuilder/AiSuggestPanel.vue';
+import ClientTopItemsPanel from '@/Components/InvoiceBuilder/ClientTopItemsPanel.vue';
 import { useModal } from 'vue-final-modal';
 
 const props = defineProps({
@@ -55,6 +57,19 @@ const selectedClientId = ref('');
 const currentItemIndex = ref(null);
 const previewHtml = ref('');
 const isPreviewLoading = ref(false);
+const isRefreshingNumber = ref(false);
+
+const refreshInvoiceNumber = async () => {
+    isRefreshingNumber.value = true;
+    try {
+        const res = await axios.get(route('api.invoices.next-number'));
+        form.invoice_number = res.data.invoice_number;
+    } catch {
+        // silently fail — user still has the original number
+    } finally {
+        isRefreshingNumber.value = false;
+    }
+};
 
 const updatePreview = async () => {
     isPreviewLoading.value = true;
@@ -228,11 +243,22 @@ const submit = () => {
 
                                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                                         <h3 class="text-lg font-medium text-gray-900 mb-4">Line Items</h3>
-                                        <LineItemsEditor 
-                                            v-model="form.items" 
+                                        <LineItemsEditor
+                                            v-model="form.items"
                                             :products="products"
                                             :currency="form.currency"
                                             @open-product-picker="handleOpenProductPicker"
+                                        />
+                                        <ClientTopItemsPanel
+                                            :client-id="form.client_id || null"
+                                            :currency="form.currency"
+                                            @add-item="(item) => form.items.push(item)"
+                                        />
+                                        <AiSuggestPanel
+                                            :client-id="form.client_id || null"
+                                            :current-items="form.items"
+                                            :currency="form.currency"
+                                            @add-item="(item) => form.items.push(item)"
                                         />
                                     </div>
 
@@ -333,13 +359,26 @@ const submit = () => {
                                         <div class="space-y-4">
                                             <div>
                                                 <InputLabel for="invoice_number" value="Invoice Number *" />
-                                                <TextInput
-                                                    id="invoice_number"
-                                                    type="text"
-                                                    class="mt-1 block w-full bg-gray-50"
-                                                    v-model="form.invoice_number"
-                                                    required
-                                                />
+                                                <div class="mt-1 flex gap-2">
+                                                    <TextInput
+                                                        id="invoice_number"
+                                                        type="text"
+                                                        class="block w-full bg-gray-50"
+                                                        v-model="form.invoice_number"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        @click="refreshInvoiceNumber"
+                                                        :disabled="isRefreshingNumber"
+                                                        title="Refresh to latest number"
+                                                        class="shrink-0 p-2 text-gray-400 hover:text-indigo-600 disabled:opacity-50 transition-colors"
+                                                    >
+                                                        <svg class="w-4 h-4" :class="{ 'animate-spin': isRefreshingNumber }" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                                 <InputError class="mt-2" :message="form.errors.invoice_number" />
                                             </div>
 
