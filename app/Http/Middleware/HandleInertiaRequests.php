@@ -29,15 +29,24 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $subscription = $user?->subscription;
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
+            'subscription' => $subscription ? [
+                'plan'                     => $subscription->plan,
+                'invoice_count_this_month' => $subscription->invoice_count_this_month,
+                'current_period_end'       => $subscription->current_period_end?->toISOString(),
+            ] : ['plan' => 'free', 'invoice_count_this_month' => 0, 'current_period_end' => null],
             'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
-                'share_link' => $request->session()->get('share_link'),
+                'success'          => $request->session()->get('success'),
+                'error'            => $request->session()->get('error'),
+                'share_link'       => $request->session()->get('share_link'),
+                'upgrade_required' => $request->session()->get('upgrade_required'),
             ],
         ];
     }

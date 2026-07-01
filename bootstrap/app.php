@@ -17,7 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\EnsureCompanyIsSet::class,
         ]);
 
-        //
+        $middleware->alias([
+            'subscription' => \App\Http\Middleware\SubscriptionMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

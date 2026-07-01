@@ -103,6 +103,16 @@ class InvoiceController extends Controller
         $user = auth()->user();
         $company = $user->companies()->first();
 
+        // Enforce Free plan limit (5 invoices/month)
+        $subscription = $user->subscription;
+        if ($subscription && $subscription->plan === 'free') {
+            if ($subscription->invoice_count_this_month >= 5) {
+                return back()->withErrors([
+                    'plan_limit' => 'คุณใช้ครบ 5 invoice ของแผน Free แล้ว กรุณาอัปเกรดเป็น Pro เพื่อออก invoice ไม่จำกัด',
+                ])->with('upgrade_required', true);
+            }
+        }
+
         // Calculate totals using TaxEngineService
         $taxInput = new TaxCalculationInput(
             items: $request->items,
@@ -171,6 +181,11 @@ class InvoiceController extends Controller
 
             $company->increment('invoice_next_number');
         });
+
+        // Increment monthly invoice counter for Free plan tracking
+        if ($subscription && $subscription->plan === 'free') {
+            $subscription->increment('invoice_count_this_month');
+        }
 
         return redirect()->route('invoices.index');
     }

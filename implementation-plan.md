@@ -1119,21 +1119,21 @@ table.items tbody td:nth-last-child(3) {
 #### สัปดาห์ 9 — Subscription Billing
 
 **วันที่ 41–42: Omise Subscription**
-- [ ] Omise Customer + PromptPay / card setup
-- [ ] Plan: Free (5 invoice/เดือน), Pro (฿199), Business (฿499)
-- [ ] Webhook: `customer.subscription.renewed` → update subscription
-- [ ] `SubscriptionMiddleware`: ตรวจ plan → block ถ้าเกิน Free limit
+- [x] Omise Customer + card setup (`OmiseService`, `omise/omise-php ^3.1`)
+- [x] Plan: Free (5 invoice/เดือน), Pro (฿199), Business (฿499)
+- [x] Webhook: `customer.subscription.renewed` → update subscription (`WebhookController`)
+- [x] `SubscriptionMiddleware`: ตรวจ plan → block Free ถ้าเกิน 5 invoice/เดือน
 
 **วันที่ 43–44: Billing UI**
-- [ ] Pricing page (public)
-- [ ] `/settings/billing`: plan info, upgrade button, invoice history
-- [ ] Upgrade flow: เลือก plan → กรอก card / PromptPay → confirm
-- [ ] Downgrade: cancel subscription → plan ลดเมื่อสิ้นรอบ
+- [x] Pricing page (public `/pricing`)
+- [x] `/settings/billing`: plan info, upgrade button, monthly usage progress bar
+- [x] Upgrade flow: เลือก plan → Omise.js card popup → POST upgrade
+- [x] Downgrade: cancel subscription → กลับเป็น Free
 
 **วันที่ 45: Settings Pages**
-- [ ] `/settings/company` — แก้ข้อมูลบริษัท, logo, brand color
-- [ ] `/settings/invoice` — prefix, default template, default language
-- [ ] `/settings/account` — password, email, delete account (PDPA)
+- [x] `/settings/company` — แก้ข้อมูลบริษัท, logo, brand color (`SettingsController`)
+- [x] `/settings/invoice` — prefix, invoice_next_number, VAT rate, currency
+- [x] `/settings/account` — password, email, delete account (PDPA modal)
 
 **Deliverable สัปดาห์ 9:** Billing ทำงาน, upgrade/downgrade ได้
 

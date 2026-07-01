@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,6 +19,16 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// Public pages
+Route::get('/pricing', function () {
+    return Inertia::render('Pricing');
+})->name('pricing');
+
+// Omise webhook (no auth, no CSRF)
+Route::post('/webhooks/omise', [WebhookController::class, 'omise'])
+    ->name('webhooks.omise')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // Public Invoice Sharing
 Route::get('invoice/share/{token}', [\App\Http\Controllers\InvoiceController::class, 'showPublic'])->name('invoices.show_public');
@@ -56,6 +69,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/api/ai/suggest-items', [\App\Http\Controllers\Api\AiSuggestController::class, 'suggest'])->name('api.ai.suggest');
         Route::get('/api/clients/{clientId}/top-items', [\App\Http\Controllers\Api\AiSuggestController::class, 'clientTopItems'])->name('api.clients.top-items');
         Route::get('/api/invoices/next-number', [\App\Http\Controllers\InvoiceController::class, 'nextNumber'])->name('api.invoices.next-number');
+
+        // Billing
+        Route::get('/settings/billing', [BillingController::class, 'index'])->name('settings.billing');
+        Route::post('/settings/billing/upgrade', [BillingController::class, 'upgrade'])->name('settings.billing.upgrade');
+        Route::post('/settings/billing/cancel', [BillingController::class, 'cancel'])->name('settings.billing.cancel');
+
+        // Settings
+        Route::get('/settings/company', [SettingsController::class, 'company'])->name('settings.company');
+        Route::post('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+        Route::get('/settings/invoice', [SettingsController::class, 'invoice'])->name('settings.invoice');
+        Route::patch('/settings/invoice', [SettingsController::class, 'updateInvoice'])->name('settings.invoice.update');
+        Route::get('/settings/account', [SettingsController::class, 'account'])->name('settings.account');
+        Route::patch('/settings/account', [SettingsController::class, 'updateAccount'])->name('settings.account.update');
+        Route::put('/settings/account/password', [SettingsController::class, 'updatePassword'])->name('settings.account.password');
+        Route::delete('/settings/account', [SettingsController::class, 'deleteAccount'])->name('settings.account.delete');
     });
 });
 

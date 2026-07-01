@@ -6,12 +6,6 @@ return [
     |--------------------------------------------------------------------------
     | Third Party Services
     |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
     */
 
     'postmark' => [
@@ -49,6 +43,12 @@ return [
     'anthropic' => [
         'api_key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
+    ],
+
+    'omise' => [
+        'public_key' => env('OMISE_PUBLIC_KEY'),
+        'secret_key' => env('OMISE_SECRET_KEY'),
+        'webhook_secret' => env('OMISE_WEBHOOK_SECRET'),
     ],
 
 ];
