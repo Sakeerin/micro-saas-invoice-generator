@@ -221,10 +221,12 @@ return [
                 'balance' => 'auto',
             ],
             'pdf-worker' => [
-                'connection' => 'redis',
-                'queue' => ['pdf'],
+                'connection'  => 'redis',
+                'queue'       => ['pdf'],
+                'balance'     => 'auto',
                 'maxProcesses' => 3,
-                'balance' => 'auto',
+                'memory'      => 256,
+                'timeout'     => 30,
             ],
             'email-worker' => [
                 'connection' => 'redis',

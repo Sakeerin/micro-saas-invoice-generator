@@ -3,22 +3,22 @@
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DemoController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WebhookController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
+        'canLogin'    => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
+
+Route::get('/demo', [DemoController::class, 'create'])->name('demo');
 
 // Public pages
 Route::get('/pricing', function () {
@@ -30,9 +30,13 @@ Route::post('/webhooks/omise', [WebhookController::class, 'omise'])
     ->name('webhooks.omise')
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
-// Public Invoice Sharing
-Route::get('invoice/share/{token}', [\App\Http\Controllers\InvoiceController::class, 'showPublic'])->name('invoices.show_public');
-Route::get('invoice/share/{token}/preview', [\App\Http\Controllers\PdfController::class, 'previewPublic'])->name('invoices.preview_public');
+// Public Invoice Sharing — rate limited to 100 req/min per IP
+Route::get('invoice/share/{token}', [\App\Http\Controllers\InvoiceController::class, 'showPublic'])
+    ->name('invoices.show_public')
+    ->middleware('throttle:share-public');
+Route::get('invoice/share/{token}/preview', [\App\Http\Controllers\PdfController::class, 'previewPublic'])
+    ->name('invoices.preview_public')
+    ->middleware('throttle:share-public');
 Route::get('tracking/pixel/{token}.gif', [\App\Http\Controllers\TrackingController::class, 'pixel'])->name('tracking.pixel');
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -59,8 +63,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('invoices/{invoice}/mark-as-paid', [\App\Http\Controllers\InvoiceController::class, 'markAsPaid'])->name('invoices.mark_as_paid');
         Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
 
-        // PDF
-        Route::get('invoices/{invoice}/download', [\App\Http\Controllers\PdfController::class, 'download'])->name('invoices.download');
+        // PDF — download limited to 5 req/min per user
+        Route::get('invoices/{invoice}/download', [\App\Http\Controllers\PdfController::class, 'download'])
+            ->name('invoices.download')
+            ->middleware('throttle:pdf-generate');
         Route::get('invoices/{invoice}/preview', [\App\Http\Controllers\PdfController::class, 'preview'])->name('invoices.preview');
         Route::post('invoices/preview', [\App\Http\Controllers\PdfController::class, 'previewDraft'])->name('invoices.preview_draft');
 
@@ -84,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/settings/account', [SettingsController::class, 'updateAccount'])->name('settings.account.update');
         Route::put('/settings/account/password', [SettingsController::class, 'updatePassword'])->name('settings.account.password');
         Route::delete('/settings/account', [SettingsController::class, 'deleteAccount'])->name('settings.account.delete');
+        Route::get('/settings/account/export', [SettingsController::class, 'exportData'])->name('settings.account.export');
     });
 });
 

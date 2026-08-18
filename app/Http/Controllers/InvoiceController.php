@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\InvoiceMail;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Services\TaxCalculationInput;
 use App\Services\TaxEngineService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\InvoiceMail;
 
 class InvoiceController extends Controller
 {
@@ -38,37 +39,46 @@ class InvoiceController extends Controller
     {
         $user = auth()->user();
         $company = $user->companies()->first();
-        
-        $query = Invoice::where('company_id', $company->id)
-            ->with('client');
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+        $filters = $request->only(['status', 'client_id', 'search']);
+        $page    = $request->input('page', 1);
 
-        if ($request->filled('client_id')) {
-            $query->where('client_id', $request->client_id);
-        }
+        $cacheKey = "invoice_list.{$company->id}." . md5(json_encode(array_merge($filters, ['page' => $page])));
 
-        if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('invoice_number', 'like', '%' . $request->search . '%')
-                  ->orWhere('client_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('client_name_en', 'like', '%' . $request->search . '%');
+        [$invoices, $clients] = Cache::tags(["company_invoices.{$company->id}"])
+            ->remember($cacheKey, 60, function () use ($company, $request, $filters) {
+                $query = Invoice::where('company_id', $company->id)->with('client');
+
+                if (!empty($filters['status'])) {
+                    $query->where('status', $filters['status']);
+                }
+                if (!empty($filters['client_id'])) {
+                    $query->where('client_id', $filters['client_id']);
+                }
+                if (!empty($filters['search'])) {
+                    $query->where(function ($q) use ($filters) {
+                        $q->where('invoice_number', 'like', '%' . $filters['search'] . '%')
+                          ->orWhere('client_name', 'like', '%' . $filters['search'] . '%')
+                          ->orWhere('client_name_en', 'like', '%' . $filters['search'] . '%');
+                    });
+                }
+
+                return [
+                    $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString(),
+                    Client::where('company_id', $company->id)->get(),
+                ];
             });
-        }
-
-        $invoices = $query->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
-
-        $clients = Client::where('company_id', $company->id)->get();
 
         return Inertia::render('Invoices/Index', [
             'invoices' => $invoices,
-            'filters' => $request->only(['status', 'client_id', 'search']),
-            'clients' => $clients,
+            'filters'  => $filters,
+            'clients'  => $clients,
         ]);
+    }
+
+    private function flushInvoiceCache(string $companyId): void
+    {
+        Cache::tags(["company_invoices.{$companyId}"])->flush();
     }
 
     /**
@@ -187,6 +197,8 @@ class InvoiceController extends Controller
             $subscription->increment('invoice_count_this_month');
         }
 
+        $this->flushInvoiceCache($company->id);
+
         return redirect()->route('invoices.index');
     }
 
@@ -203,6 +215,8 @@ class InvoiceController extends Controller
         }
 
         $invoice->delete();
+
+        $this->flushInvoiceCache($company->id);
 
         return redirect()->route('invoices.index');
     }
@@ -261,6 +275,8 @@ class InvoiceController extends Controller
 
             $company->increment('invoice_next_number');
         });
+
+        $this->flushInvoiceCache($company->id);
 
         return redirect()->route('invoices.index');
     }
@@ -394,6 +410,8 @@ class InvoiceController extends Controller
             'type' => 'paid',
             'meta' => ['user_id' => auth()->id()],
         ]);
+
+        $this->flushInvoiceCache($company->id);
 
         return back()->with('success', 'Invoice marked as paid.');
     }

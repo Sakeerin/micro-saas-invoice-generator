@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SettingsController extends Controller
 {
@@ -127,5 +130,40 @@ class SettingsController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'ลบบัญชีแล้ว ขอบคุณที่ใช้บริการ');
+    }
+
+    // ── PDPA: Export all personal data ────────────────────────────────────────
+
+    public function exportData(): StreamedResponse
+    {
+        $user    = auth()->user();
+        $company = $user->companies()->first();
+
+        $data = [
+            'exported_at' => now()->toIso8601String(),
+            'user' => $user->only(['id', 'name', 'email', 'created_at', 'updated_at']),
+            'company' => $company ? $company->only([
+                'id', 'name', 'name_en', 'address', 'address_en',
+                'tax_id', 'phone', 'email', 'invoice_prefix',
+                'default_vat_rate', 'default_currency', 'created_at',
+            ]) : null,
+            'clients' => $company
+                ? Client::where('company_id', $company->id)
+                    ->get(['id', 'name', 'name_en', 'address', 'tax_id', 'contact_name', 'contact_email', 'contact_phone', 'created_at'])
+                : [],
+            'invoices' => $company
+                ? Invoice::where('company_id', $company->id)
+                    ->with(['items:id,invoice_id,name,name_en,quantity,unit_price,line_total'])
+                    ->get(['id', 'invoice_number', 'client_name', 'issue_date', 'due_date', 'subtotal', 'vat_amount', 'wht_amount', 'total', 'status', 'currency', 'created_at'])
+                : [],
+        ];
+
+        $filename = 'my-data-' . now()->format('Y-m-d') . '.json';
+
+        return response()->streamDownload(function () use ($data) {
+            echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }, $filename, [
+            'Content-Type' => 'application/json',
+        ]);
     }
 }

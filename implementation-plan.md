@@ -1141,16 +1141,16 @@ table.items tbody td:nth-last-child(3) {
 
 #### สัปดาห์ 10 — Polish + Launch
 
-**วันที่ 46–47: Landing Page**
-- [ ] หน้า landing: hero, features, pricing, testimonials (beta users), FAQ
-- [ ] Video demo (screen record 90 วินาที)
-- [ ] `/demo`: สร้าง demo account พร้อม sample data
+**วันที่ 46–47: Landing Page** ✅
+- [x] หน้า landing: hero, features, pricing, testimonials (beta users), FAQ — `resources/js/Pages/Welcome.vue`
+- [x] Video demo placeholder (ส่วน video embed พร้อม CTA ลอง demo)
+- [x] `/demo`: สร้าง demo account พร้อม sample data — `DemoController` seeds 3 clients, 5 products, 6 invoices (paid/sent/overdue/draft/viewed)
 
-**วันที่ 48: Performance + Security**
-- [ ] Rate limiting: `/invoice/share` (100 req/min per IP), PDF generate (5 req/min per user)
-- [ ] Cache invoice list (Redis TTL 1 นาที, invalidate เมื่อมีการเปลี่ยนแปลง)
-- [ ] Limit PDF concurrent jobs: queue `pdf` max 3 workers
-- [ ] PDPA: export ข้อมูลทั้งหมด JSON, delete account
+**วันที่ 48: Performance + Security** ✅
+- [x] Rate limiting: share routes 100 req/min per IP (`throttle:share-public`), PDF download 5 req/min per user (`throttle:pdf-generate`) — กำหนดใน `AppServiceProvider` via `RateLimiter::for()`
+- [x] Cache invoice list: Redis cache tags `company_invoices.{id}` TTL 60s, invalidate เมื่อ store/destroy/duplicate/markAsPaid
+- [x] Limit PDF concurrent jobs: Horizon `pdf-worker` `maxProcesses=3`, `timeout=30s`, `memory=256MB`
+- [x] PDPA: export ข้อมูลทั้งหมด JSON — `GET /settings/account/export` → `SettingsController::exportData()` returns streamed download; delete account already implemented
 
 **วันที่ 49: Beta Testing**
 - [ ] Invite 20 beta users (freelancer + SME เล็ก)
